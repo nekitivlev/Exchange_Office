@@ -20,6 +20,9 @@ contract ExchangeOffice is ReentrancyGuard, Pausable, Ownable {
     event EmergencyWithdraw(address indexed token, uint256 amount);
     event EmergencyEthWithdraw(uint256 amount);
     event ShutdownInitiated(address indexed by);
+    
+    // Add this function to allow the contract to receive ETH
+    receive() external payable {}
 
     /// @notice Ensures the contract is not in shutdown state
     modifier notShutdown() {
@@ -41,6 +44,7 @@ contract ExchangeOffice is ReentrancyGuard, Pausable, Ownable {
     /// @param token The token address
     /// @param amount Amount of tokens to supply
     function supplyToken(address token, uint256 amount) external onlyOwner {
+        require(amount > 0, "Amount must be greater than 0"); // Add this check
         IERC20 tokenContract = IERC20(token);
         require(amount <= tokenContract.balanceOf(msg.sender), "Insufficient token balance");
         require(tokenContract.transferFrom(msg.sender, address(this), amount), "Transfer failed");
@@ -55,11 +59,13 @@ contract ExchangeOffice is ReentrancyGuard, Pausable, Ownable {
     whenNotPaused
     notShutdown
     {
+        require(amount > 0, "Amount must be greater than 0"); // Add this check
         IERC20 token = IERC20(_token);
         uint256 rate = rates[token];
         require(rate != 0, "Token not supported");
 
-        uint256 weiRequired = amount * rate;
+        // Fix the calculation by dividing by 1e18
+        uint256 weiRequired = amount * rate / 1e18;
         require(msg.value >= weiRequired, "Insufficient ETH sent for purchase");
         require(amount <= token.balanceOf(address(this)), "Insufficient exchange office token balance");
 
@@ -81,12 +87,14 @@ contract ExchangeOffice is ReentrancyGuard, Pausable, Ownable {
     whenNotPaused
     notShutdown
     {
+        require(amount > 0, "Amount must be greater than 0"); // Add this check
         IERC20 token = IERC20(_token);
         uint256 rate = rates[token];
         require(rate != 0, "Token not supported");
         require(token.balanceOf(msg.sender) >= amount, "Insufficient token balance");
 
-        uint256 weiToReturn = amount * rate;
+        // Fix the calculation by dividing by 1e18
+        uint256 weiToReturn = amount * rate / 1e18;
         require(weiToReturn <= address(this).balance, "Insufficient exchange office ETH balance");
 
         require(token.transferFrom(msg.sender, address(this), amount), "Token transfer failed");
@@ -113,6 +121,7 @@ contract ExchangeOffice is ReentrancyGuard, Pausable, Ownable {
     /// @param token The token address to withdraw
     /// @param amount Amount of tokens to withdraw
     function withdrawToken(address token, uint256 amount) external onlyOwner {
+        require(amount > 0, "Amount must be greater than 0"); // Add this check
         IERC20 tokenContract = IERC20(token);
         require(amount <= tokenContract.balanceOf(address(this)), "Insufficient token balance");
         require(tokenContract.transfer(owner(), amount), "Transfer failed");
@@ -122,6 +131,7 @@ contract ExchangeOffice is ReentrancyGuard, Pausable, Ownable {
     /// @notice Emergency withdrawal of ETH
     /// @param amount Amount of ETH to withdraw
     function withdrawETH(uint256 amount) external onlyOwner {
+        require(amount > 0, "Amount must be greater than 0"); // Add this check
         require(amount <= address(this).balance, "Insufficient ETH balance");
         payable(owner()).transfer(amount);
         emit EmergencyEthWithdraw(amount);

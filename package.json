@@ -1,0 +1,33 @@
+{
+  "name": "decentralized-exchange-office",
+  "version": "1.0.0",
+  "description": "A decentralized exchange platform for trading ERC20 tokens against ETH",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "compile": "hardhat compile",
+    "clean": "hardhat clean"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "exchange",
+    "tokens",
+    "defi"
+  ],
+  "author": "",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "chai": "^4.3.7",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.12.4",
+    "solidity-coverage": "^0.8.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.0"
+  }
+}
